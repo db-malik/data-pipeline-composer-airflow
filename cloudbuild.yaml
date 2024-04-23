@@ -1,19 +1,13 @@
 steps:
-- name: ubuntu
-  args: ['bash', '-c', "echo '$COMMIT_SHA' > REVISION.txt"]
-- name: gcr.io/cloud-builders/gsutil
-  args:
-    - '-m'
-    - 'rsync'
-    - '-d'
-    - '-r'
-    - 'dags'
-    - 'gs://${_GCS_BUCKET}/dags'
-- name: gcr.io/cloud-builders/gsutil
-  args:
-    - '-m'
-    - 'rsync'
-    - '-d'
-    - '-r'
-    - 'plugins'
-    - 'gs://${_GCS_BUCKET}/plugins'
+  # Copy the DAG files to the Google Cloud Storage bucket used by Composer
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gsutil'
+    args: ['-m', 'cp', '-r', './dags/', 'gs://$_COMPOSER_BUCKET/dags/']
+
+timeout: '1200s'  # Set the timeout as needed
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'  # Adjust machine type based on need
+
+substitutions:
+  _COMPOSER_BUCKET: 'europe-west3-data-pipeline--252e6c41-bucket'  # Substitute with your actual bucket name
