@@ -2,7 +2,7 @@ steps:
   # Copy the DAG files to the Google Cloud Storage bucket used by Composer
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gsutil'
-    args: ['-m', 'cp', '-r', './dags/', 'gs://$_COMPOSER_BUCKET/dags/']
+    args: ['-m', 'cp', '-r', './', 'gs://$_COMPOSER_BUCKET/dags/']
 
 timeout: '1200s'  # Set the timeout as needed
 options:
