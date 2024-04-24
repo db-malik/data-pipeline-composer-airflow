@@ -72,4 +72,4 @@ with DAG(
     )
 
     # Define task dependencies
-    create_bq_table_task >> load_to_bq_task
+    create_dataset_task >> create_bq_table_task >> load_to_bq_task
