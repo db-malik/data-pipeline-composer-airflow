@@ -75,7 +75,10 @@ with DAG(
             {"name": "Price", "type": "STRING", "mode": "NULLABLE"},
             {"name": "SaleDate", "type": "STRING", "mode": "NULLABLE"},
         ],
-        autodetect=False,
+        skip_leading_rows=1,  # Skip the first row (header)
+        autodetect=False,  # Explicit schema provided, so autodetect is not needed
+        field_delimiter=",",  # Assuming CSV delimiter is comma
+        encoding="UTF-8",
     )
 
     # Define task dependencies
