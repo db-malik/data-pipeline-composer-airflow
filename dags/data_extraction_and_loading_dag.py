@@ -9,6 +9,7 @@ from airflow.providers.google.cloud.operators.bigquery import (
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
+from airflow.utils.trigger_rule import TriggerRule
 
 
 # Constants
@@ -94,7 +95,7 @@ with DAG(
         destination_bucket=BUCKET_NAME,
         destination_object='data/archive/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
         move_object=True,
-        trigger_rule="all_success",  # This makes the task execute only if the previous tasks were successful
+        trigger_rule=TriggerRule.ALL_SUCCESS,  # This makes the task execute only if the previous tasks were successful
     )
 
     # Move file to error on failure
@@ -105,7 +106,7 @@ with DAG(
         destination_bucket=BUCKET_NAME,
         destination_object='data/error/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
         move_object=True,
-        trigger_rule="one_failed",  # This makes the task execute if any of the previous tasks failed
+        trigger_rule=TriggerRule.ONE_FAILED,  # This makes the task execute if any of the previous tasks failed
     )
 
     # Define task dependencies
