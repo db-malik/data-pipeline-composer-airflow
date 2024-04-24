@@ -91,20 +91,19 @@ with DAG(
     move_file_to_archive = GCSToGCSOperator(
         task_id="move_file_to_archive",
         source_bucket=BUCKET_NAME,
-        source_object=CSV_SOURCE,
+        source_object="data/in/SALES.csv",
         destination_bucket=BUCKET_NAME,
-        destination_object='data/archive/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
+        destination_object="data/archive/SALES.csv",
         move_object=True,
         trigger_rule=TriggerRule.ALL_SUCCESS,  # This makes the task execute only if the previous tasks were successful
     )
 
-    # Move file to error on failure
     move_file_to_error = GCSToGCSOperator(
         task_id="move_file_to_error",
         source_bucket=BUCKET_NAME,
-        source_object=CSV_SOURCE,
+        source_object="data/in/SALES.csv",
         destination_bucket=BUCKET_NAME,
-        destination_object='data/error/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
+        destination_object="data/error/SALES.csv",
         move_object=True,
         trigger_rule=TriggerRule.ONE_FAILED,  # This makes the task execute if any of the previous tasks failed
     )
