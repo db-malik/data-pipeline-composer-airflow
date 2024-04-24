@@ -4,12 +4,11 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import (
 )
 from airflow.providers.google.cloud.operators.bigquery import (
     BigQueryCreateEmptyTableOperator,
+    BigQueryCreateEmptyDatasetOperator,
 )
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateEmptyDatasetOperator,
-)
+
 
 # Constants
 PROJECT_ID = "airflow-composer-transform-csv"
