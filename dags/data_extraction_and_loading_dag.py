@@ -9,6 +9,7 @@ PROJECT_ID = 'airflow-composer-transform-csv'
 BUCKET_NAME = 'gcs-viseo-data-academy-22024-1'
 FOLDER_NAME = 'DATA/in'
 DATASET_NAME = 'raw'
+LOCATION='europe-west3'
 TABLE_PREFIX = 'RAW_SALES_TABLE'
 CSV_SOURCE = f'gs://{BUCKET_NAME}/{FOLDER_NAME}/*.csv'
 
@@ -31,6 +32,14 @@ with DAG(
     description='DAG for extracting data from CSV files and loading into BigQuery',
     schedule_interval='0 10 * * *',  # Trigger daily at 10 AM UTC
 ) as dag:
+  
+    create_dataset_task = BigQueryCreateEmptyDatasetOperator(
+        task_id='create_dataset',
+        dataset_id=DATASET_NAME,
+        project_id=PROJECT_ID,  # Specify the project where the dataset should be created
+        location=LOCATION, # Change to your dataset location if different
+        exists_ok=True,  # This avoids failing if the dataset already exists
+    )
 
     create_bq_table_task = BigQueryCreateEmptyTableOperator(
         task_id='create_bq_table',
