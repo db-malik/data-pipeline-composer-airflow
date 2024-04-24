@@ -42,8 +42,8 @@ with DAG(
     create_dataset_task = BigQueryCreateEmptyDatasetOperator(
         task_id="create_dataset",
         dataset_id=DATASET_NAME,
-        project_id=PROJECT_ID,  # Specify the project where the dataset should be created
-        location=LOCATION,  # Change to your dataset location if different
+        project_id=PROJECT_ID,
+        location=LOCATION,
         exists_ok=True,  # This avoids failing if the dataset already exists
     )
 
@@ -58,7 +58,7 @@ with DAG(
             {"name": "Price", "type": "STRING"},
             {"name": "SaleDate", "type": "STRING"},
         ],
-        project_id="airflow-composer-transform-csv",  # Replace with your GCP project ID
+        project_id="airflow-composer-transform-csv",
     )
 
     load_to_bq_task = GCSToBigQueryOperator(
@@ -68,6 +68,13 @@ with DAG(
         destination_project_dataset_table=f"{DATASET_NAME}.{TABLE_PREFIX}",
         source_format="CSV",
         write_disposition="WRITE_TRUNCATE",
+        schema_fields=[
+            {"name": "SaleID", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "ProductID", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "Quantity", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "Price", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "SaleDate", "type": "STRING", "mode": "NULLABLE"},
+        ],
         autodetect=False,
     )
 
