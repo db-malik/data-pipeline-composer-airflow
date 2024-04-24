@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 # Constants
 PROJECT_ID = "airflow-composer-transform-csv"
 BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
-FOLDER_NAME = "DATA/in"
+FOLDER_NAME = "data/in"
 DATASET_NAME = "raw"
 LOCATION = "europe-west3"
 TABLE_PREFIX = "RAW_SALES_TABLE"
