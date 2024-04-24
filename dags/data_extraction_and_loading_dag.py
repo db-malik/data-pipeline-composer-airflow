@@ -8,16 +8,21 @@ from airflow.providers.google.cloud.operators.bigquery import (
 )
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
+from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
 
 
 # Constants
 PROJECT_ID = "airflow-composer-transform-csv"
 BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
-FOLDER_NAME = "data/in"
+FOLDER_NAME = "data"
 DATASET_NAME = "raw"
 LOCATION = "europe-west3"
 TABLE_PREFIX = "RAW_SALES_TABLE"
-CSV_SOURCE = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/*.csv"
+CSV_SOURCE = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/in/*.csv"
+source_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/in/"
+archive_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/archive/"
+error_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/error/"
+
 
 # Define default arguments for the DAG
 default_args = {
@@ -81,5 +86,29 @@ with DAG(
         encoding="UTF-8",
     )
 
+    # Move file to archive on success
+    move_file_to_archive = GCSToGCSOperator(
+        task_id="move_file_to_archive",
+        source_bucket=BUCKET_NAME,
+        source_object=CSV_SOURCE,
+        destination_bucket=BUCKET_NAME,
+        destination_object='data/archive/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
+        move_object=True,
+        trigger_rule="all_success",  # This makes the task execute only if the previous tasks were successful
+    )
+
+    # Move file to error on failure
+    move_file_to_error = GCSToGCSOperator(
+        task_id="move_file_to_error",
+        source_bucket=BUCKET_NAME,
+        source_object=CSV_SOURCE,
+        destination_bucket=BUCKET_NAME,
+        destination_object='data/error/{{ task_instance.xcom_pull(task_ids="load_to_bigquery", key="return_value") }}',
+        move_object=True,
+        trigger_rule="one_failed",  # This makes the task execute if any of the previous tasks failed
+    )
+
     # Define task dependencies
     create_dataset_task >> create_bq_table_task >> load_to_bq_task
+    load_to_bq_task >> move_file_to_archive
+    load_to_bq_task >> move_file_to_error
