@@ -1,0 +1,59 @@
+# Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyc
+*.pyd
+*.py[co]
+
+# Terraform specific
+*.tfstate
+*.tfstate.*
+*.tfvars.json
+*.tfvars
+*.tfplan
+*.tfa
+terraform.tfstate.d/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform/
+.terraform.lock.hcl 
+
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Dependency directories
+bin/
+lib/
+lib64/
+include/
+share/
+python*.egg-info/
+dist/
+build/
+*.egg
+*.egg-info
+pip-wheel-metadata/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Editors
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.idea/
+
+# Miscellaneous
+.DS_Store
+*.bak
+*.swp
+*.tmp
+
+credentials/

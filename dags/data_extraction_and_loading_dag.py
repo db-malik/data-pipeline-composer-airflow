@@ -10,6 +10,7 @@ from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
 from airflow.utils.trigger_rule import TriggerRule
+from airflow.operators.dagrun_operator import TriggerDagRunOperator
 
 
 # Constants
@@ -105,10 +106,16 @@ with DAG(
         destination_bucket=BUCKET_NAME,
         destination_object="data/error/SALES.csv",
         move_object=True,
-        trigger_rule=TriggerRule.ONE_FAILED,  # This makes the task execute if any of the previous tasks failed
+        trigger_rule=TriggerRule.ONE_FAILED,
+    )
+
+    trigger_second_dag = TriggerDagRunOperator(
+        task_id="trigger_second_dag",
+        trigger_dag_id="data_transformation_and_loading",
+        conf={"message": "Triggered from first_dag"},
     )
 
     # Define task dependencies
-    create_dataset_task >> create_bq_table_task >> load_to_bq_task
+    create_dataset_task >> create_bq_table_task >> load_to_bq_task >> trigger_second_dag
     load_to_bq_task >> move_file_to_archive
     load_to_bq_task >> move_file_to_error
