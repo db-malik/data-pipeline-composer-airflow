@@ -24,7 +24,7 @@ default_args = {
 
 def truncate_target_table():
     sql = f"TRUNCATE TABLE {TARGET_DATASET_NAME}.{TABLE_NAME};"
-    hook = BigQueryHook()
+    hook = BigQueryHook(use_legacy_sql=False)  # Ensure using Standard SQL
     hook.run(sql)
 
 
