@@ -4,6 +4,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
+from google.cloud import bigquery
 
 # Constants
 SOURCE_DATASET_NAME = "raw"
@@ -25,19 +26,23 @@ default_args = {
 
 
 def truncate_target_table():
-    sql = f"TRUNCATE TABLE {SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME};"
-    hook = BigQueryHook(use_legacy_sql=False)  # Ensure using Standard SQL
-    hook.run(sql)
+    client = bigquery.Client()
+    sql_query = (
+        f"TRUNCATE TABLE `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`"
+    )
+    query_job = client.query(sql_query)
+    query_job.result()  # Wait for the query to complete
 
 
 def load_transformed_data():
+    client = bigquery.Client()
     transformation_sql = f"""
-    INSERT INTO {TARGET_DATASET_NAME}.{TARGET_TABLE_NAME} (id, date, quantity, price, total_price)
+    INSERT INTO `{client.project}.{TARGET_DATASET_NAME}.{TARGET_TABLE_NAME}` (id, date, quantity, price, total_price)
     SELECT id, CAST(date AS DATE), CAST(quantity AS NUMERIC), CAST(price AS NUMERIC), quantity * price AS total_price
-    FROM {SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME};
+    FROM `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`;
     """
-    hook = BigQueryHook()
-    hook.run(transformation_sql)
+    query_job = client.query(transformation_sql)
+    query_job.result()  # Wait for the query to complete
 
 
 with DAG(
