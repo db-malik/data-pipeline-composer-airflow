@@ -10,7 +10,7 @@ from google.cloud import bigquery
 SOURCE_DATASET_NAME = "raw"
 SOURCE_TABLE_NAME = "RAW_SALES_TABLE"
 TARGET_DATASET_NAME = "DATAWERHOUSE_TERRAFRM"
-TARGET_TABLE_NAME = "trasformed_Table"
+TARGET_TABLE_NAME = "transformed_Table"
 
 
 default_args = {
