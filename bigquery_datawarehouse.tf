@@ -10,7 +10,8 @@ resource "google_bigquery_table" "transformed_table" {
     { "name" : "SaleID", "type" : "INTEGER", "mode" : "NULLABLE" },
     { "name" : "ProductID", "type" : "STRING", "mode" : "NULLABLE" },
     { "name" : "Quantity", "type" : "INTEGER", "mode" : "NULLABLE" },
-    { "name" : "Price", "type" : "FLOAT", "mode" : "NULLABLE" },
-    { "name" : "SaleDate", "type" : "DATE", "mode" : "NULLABLE" }
+    { "name" : "Price", "type" : "NUMERIC", "mode" : "NULLABLE" },
+    { "name" : "SaleDate", "type" : "DATE", "mode" : "NULLABLE" },
+    { "name" : "TotalPrice", "type" : "NUMERIC", "mode" : "NULLABLE" }
   ])
 }
