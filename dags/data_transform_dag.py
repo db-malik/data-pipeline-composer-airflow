@@ -37,8 +37,8 @@ def truncate_target_table():
 def load_transformed_data():
     client = bigquery.Client()
     transformation_sql = f"""
-    INSERT INTO `{client.project}.{TARGET_DATASET_NAME}.{TARGET_TABLE_NAME}` (SaleID, ProductID, Quantity, Price, SaleDate, total_price)
-    SELECT CAST (SaleID as INTEGER), CAST(ProductID as STRING) , CAST(quantity AS INTEGER),  CAST(Price AS NUMERIC), CAST(SaleDate AS DATE),         CAST(quantity * price AS NUMERIC) AS total_price
+    INSERT INTO `{client.project}.{TARGET_DATASET_NAME}.{TARGET_TABLE_NAME}` (SaleID, ProductID, Quantity, Price, SaleDate, TotalPrice)
+    SELECT CAST (SaleID as INTEGER), CAST(ProductID as STRING) , CAST(quantity AS INTEGER),  CAST(Price AS NUMERIC), CAST(SaleDate AS DATE), CAST(quantity * price AS NUMERIC) AS TotalPrice
 
     FROM `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`;
     """
