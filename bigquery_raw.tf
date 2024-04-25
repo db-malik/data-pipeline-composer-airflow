@@ -1,5 +1,5 @@
 resource "google_bigquery_dataset" "raw_dataset" {
-  dataset_id = "RAW_DATASET_TERRAFORM"
+  dataset_id = "RAW"
   location   = "europe-west3"
 }
 

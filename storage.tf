@@ -6,8 +6,8 @@ resource "google_storage_bucket" "composer_bucket" {
 resource "google_storage_bucket_object" "data_in_folder" {
   name         = "data/in/"
   bucket       = google_storage_bucket.composer_bucket.name
-  content_type = "application/x-www-form-urlencoded"
-  content      = "docs/SALES.csv"
+  content_type = "text/plain"
+  content      = "This is a placeholder file to maintain directory structure."
 }
 
 resource "google_storage_bucket_object" "data_archive_folder" {
