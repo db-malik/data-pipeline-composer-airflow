@@ -57,7 +57,7 @@ with DAG(
     load_to_bq_task = GCSToBigQueryOperator(
         task_id="load_to_bigquery",
         bucket=BUCKET_NAME,
-        source_objects=[f"{FOLDER_NAME}/*.csv"],
+        source_objects=[f"{CSV_SOURCE}"],
         destination_project_dataset_table=f"{DATASET_NAME}.{TABLE_PREFIX}",
         source_format="CSV",
         write_disposition="WRITE_TRUNCATE",
