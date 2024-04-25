@@ -6,15 +6,17 @@ from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 
 # Constants
-SOURCE_DATASET_NAME = "raw_dataset"
+SOURCE_DATASET_NAME = "raw"
+SOURCE_TABLE_NAME = "RAW_SALES_TABLE"
 TARGET_DATASET_NAME = "DATAWERHOUSE_TERRAFRM"
-TABLE_NAME = "transformed_Table"
+TARGET_TABLE_NAME = "trasformed_Table"
+
 
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "email": ["your.email@example.com"],
-    "email_on_failure": False,
+    "email": ["malek.dbouba@pm.me"],
+    "email_on_failure": True,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
@@ -23,16 +25,16 @@ default_args = {
 
 
 def truncate_target_table():
-    sql = f"TRUNCATE TABLE {TARGET_DATASET_NAME}.{TABLE_NAME};"
+    sql = f"TRUNCATE TABLE {SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME};"
     hook = BigQueryHook(use_legacy_sql=False)  # Ensure using Standard SQL
     hook.run(sql)
 
 
 def load_transformed_data():
     transformation_sql = f"""
-    INSERT INTO {TARGET_DATASET_NAME}.{TABLE_NAME} (id, date, quantity, price, total_price)
+    INSERT INTO {TARGET_DATASET_NAME}.{TARGET_TABLE_NAME} (id, date, quantity, price, total_price)
     SELECT id, CAST(date AS DATE), CAST(quantity AS NUMERIC), CAST(price AS NUMERIC), quantity * price AS total_price
-    FROM {SOURCE_DATASET_NAME}.raw_table;
+    FROM {SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME};
     """
     hook = BigQueryHook()
     hook.run(transformation_sql)
