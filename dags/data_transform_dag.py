@@ -38,7 +38,7 @@ def load_transformed_data():
     client = bigquery.Client()
     transformation_sql = f"""
     INSERT INTO `{client.project}.{TARGET_DATASET_NAME}.{TARGET_TABLE_NAME}` (SaleID, ProductID, Quantity, Price, SaleDate)
-    SELECT CAST (SaleID as INTEGER), CAST(ProductID as STRING) , CAST(quantity AS INTEGER), CAST( Price as FLOAT),  CAST(SaleDate AS DATE), quantity * price AS total_price
+    SELECT CAST (SaleID as INTEGER), CAST(ProductID as STRING) , CAST(quantity AS INTEGER),  CAST(Price AS FLOAT64), CAST(SaleDate AS DATE), quantity * price AS total_price
     FROM `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`;
     """
     query_job = client.query(transformation_sql)
