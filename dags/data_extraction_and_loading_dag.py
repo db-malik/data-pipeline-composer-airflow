@@ -18,7 +18,7 @@ from airflow.operators.dummy_operator import DummyOperator
 PROJECT_ID = "airflow-composer-transform-csv"
 BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
 FOLDER_NAME = "data"
-DATASET_NAME = "raw"
+DATASET_NAME = "RAW"
 LOCATION = "europe-west3"
 TABLE_PREFIX = "RAW_SALES_TABLE"
 CSV_SOURCE = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/in/*.csv"

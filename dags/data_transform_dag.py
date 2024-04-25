@@ -7,10 +7,10 @@ from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.cloud import bigquery
 
 # Constants
-SOURCE_DATASET_NAME = "raw"
+SOURCE_DATASET_NAME = "RAW"
 SOURCE_TABLE_NAME = "RAW_SALES_TABLE"
-TARGET_DATASET_NAME = "DATAWERHOUSE_TERRAFRM"
-TARGET_TABLE_NAME = "transformed_Table"
+TARGET_DATASET_NAME = "DATAWERHOUSE"
+TARGET_TABLE_NAME = "DWH"
 
 # Default arguments for the DAG
 default_args = {
