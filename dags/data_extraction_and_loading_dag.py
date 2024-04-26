@@ -33,17 +33,18 @@ load_dotenv()
 # ARCHIVE_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/archive/"
 # ERROR_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/error/"
 
-# Accessing the variables
-PROJECT_ID = os.getenv("PROJECT_ID")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
-LOCATION = os.getenv("LOCATION")
-DATA_FOLDER = os.getenv("DATA_FOLDER")
-IN_FOLDER = os.getenv("IN_FOLDER")
-ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
-ERROR_FOLDER = os.getenv("ERROR_FOLDER")
-RAW_DATASET = os.getenv("RAW_DATASET")
-RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
-CSV_FILE_NAME = os.getenv("CSV_FILE_NAME")
+# # Accessing the variables
+# PROJECT_NAME = os.getenv("PROJECT_NAME")
+# BUCKET_NAME = os.getenv("BUCKET_NAME")
+# LOCATION = os.getenv("LOCATION")
+# DATA_FOLDER = os.getenv("DATA_FOLDER")
+# IN_FOLDER = os.getenv("IN_FOLDER")
+# ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
+# ERROR_FOLDER = os.getenv("ERROR_FOLDER")
+# RAW_DATASET = os.getenv("RAW_DATASET")
+# RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
+
+CSV_FILE_NAME = "SALES.csv"
 
 
 # Define default arguments for the DAG: no retries, and start running on January 1st, 2024
