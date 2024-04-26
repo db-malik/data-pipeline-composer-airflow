@@ -7,7 +7,12 @@ from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
+import os
 
+
+# Accessing the variables
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+RAW_DATASET = os.getenv("RAW_DATASET")
 
 CSV_FILE_NAME = "SALES.csv"
 
