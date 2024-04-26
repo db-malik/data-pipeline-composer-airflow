@@ -2,29 +2,48 @@ from airflow import DAG
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import (
     GCSToBigQueryOperator,
 )
-from airflow.providers.google.cloud.operators.bigquery import (
-    BigQueryCreateEmptyTableOperator,
-    BigQueryCreateEmptyDatasetOperator,
-)
-from airflow.utils.dates import days_ago
-from datetime import datetime, timedelta
+from datetime import datetime
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
 
+# Import the load_dotenv function from the dotenv module
+from dotenv import load_dotenv
+import os
+
+# Load the environment variables from the .env file
+load_dotenv()
 
 # Constants used across the DAG for GCS and BigQuery settings
-PROJECT_ID = "airflow-composer-transform-csv"
-BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
-FOLDER_NAME = "data"
-DATASET_NAME = "RAW"
-LOCATION = "europe-west3"
-TABLE_PREFIX = "RAW_SALES_TABLE"
-CSV_SOURCE = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/in/*.csv"
-source_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/in/"
-archive_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/archive/"
-error_path = f"gs://{BUCKET_NAME}/{FOLDER_NAME}/error/"
+# PROJECT_ID = "airflow-composer-transform-csv"
+# BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
+# LOCATION = "europe-west3"
+
+# DATA_FOLDER = "data"
+# IN_FOLDER = "in"
+# ARCHIVE_FOLDER = "archive"
+# ERROR_FOLDER = "error"
+
+# RAW_DATASET = "RAW"
+# RAW_SALES_TABLE = "RAW_SALES_TABLE"
+
+# CSV_SOURCE = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/in/*.csv"
+# IN_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/in/"
+# ARCHIVE_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/archive/"
+# ERROR_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/error/"
+
+# Accessing the variables
+PROJECT_ID = os.getenv("PROJECT_ID")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+LOCATION = os.getenv("LOCATION")
+DATA_FOLDER = os.getenv("DATA_FOLDER")
+IN_FOLDER = os.getenv("IN_FOLDER")
+ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
+ERROR_FOLDER = os.getenv("ERROR_FOLDER")
+RAW_DATASET = os.getenv("RAW_DATASET")
+RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
+CSV_FILE_NAME = os.getenv("CSV_FILE_NAME")
 
 
 # Define default arguments for the DAG: no retries, and start running on January 1st, 2024
@@ -57,8 +76,8 @@ with DAG(
     load_to_bq_task = GCSToBigQueryOperator(
         task_id="load_to_bigquery",
         bucket=BUCKET_NAME,
-        source_objects=[f"{CSV_SOURCE}"],
-        destination_project_dataset_table=f"{DATASET_NAME}.{TABLE_PREFIX}",
+        source_objects=[f"{DATA_FOLDER}/*.csv"],
+        destination_project_dataset_table=f"{RAW_DATASET}.{RAW_SALES_TABLE}",
         source_format="CSV",
         write_disposition="WRITE_TRUNCATE",
         schema_fields=[
@@ -78,9 +97,9 @@ with DAG(
     move_file_to_archive = GCSToGCSOperator(
         task_id="move_file_to_archive",
         source_bucket=BUCKET_NAME,
-        source_object="data/in/SALES.csv",
+        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/{CSV_FILE_NAME}",
         destination_bucket=BUCKET_NAME,
-        destination_object="data/archive/SALES.csv",
+        destination_object=f"{DATA_FOLDER}/{ARCHIVE_FOLDER}/",
         move_object=True,
         trigger_rule=TriggerRule.ALL_SUCCESS,  # This makes the task execute only if the previous tasks were successful
     )
@@ -89,9 +108,9 @@ with DAG(
     move_file_to_error = GCSToGCSOperator(
         task_id="move_file_to_error",
         source_bucket=BUCKET_NAME,
-        source_object="data/in/SALES.csv",
+        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/{CSV_FILE_NAME}",
         destination_bucket=BUCKET_NAME,
-        destination_object="data/error/SALES.csv",
+        destination_object=f"{DATA_FOLDER}/{IN_FOLDER}/",
         move_object=True,
         trigger_rule=TriggerRule.ONE_FAILED,
     )

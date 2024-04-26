@@ -6,11 +6,18 @@ from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.cloud import bigquery
 
-# Constants
-SOURCE_DATASET_NAME = "RAW"
-SOURCE_TABLE_NAME = "RAW_SALES_TABLE"
-TARGET_DATASET_NAME = "DATAWERHOUSE"
-TARGET_TABLE_NAME = "DWH"
+from dotenv import load_dotenv
+import os
+
+# Load the environment variables from the .env file
+load_dotenv()
+
+# Accessing the variables
+RAW_DATASET = os.getenv("RAW_DATASET")
+RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
+DATAWERHOUSE_DATASET = os.getenv("DATAWERHOUSE_DATASET")
+DWH_TABLE = os.getenv("DWH")
+
 
 # Default arguments for the DAG
 default_args = {
@@ -25,9 +32,7 @@ default_args = {
 # Function to truncate the target table before loading new data
 def truncate_target_table():
     client = bigquery.Client()
-    sql_query = (
-        f"TRUNCATE TABLE `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`"
-    )
+    sql_query = f"TRUNCATE TABLE `{client.project}.{RAW_DATASET}.{RAW_SALES_TABLE}`"
     query_job = client.query(sql_query)
     query_job.result()  # Wait for the query to complete
 
@@ -36,9 +41,9 @@ def truncate_target_table():
 def load_transformed_data():
     client = bigquery.Client()
     transformation_sql = f"""
-    INSERT INTO `{client.project}.{TARGET_DATASET_NAME}.{TARGET_TABLE_NAME}` (SaleID, ProductID, Quantity, Price, SaleDate, TotalPrice)
+    INSERT INTO `{client.project}.{DATAWERHOUSE_DATASET}.{DWH_TABLE}` (SaleID, ProductID, Quantity, Price, SaleDate, TotalPrice)
     SELECT CAST(SaleID as INTEGER), CAST(ProductID as STRING), CAST(quantity AS INTEGER),  CAST(Price AS NUMERIC), CAST(SaleDate AS DATE), CAST(CAST(quantity AS NUMERIC) * CAST(Price AS NUMERIC) AS NUMERIC) AS TotalPrice
-    FROM `{client.project}.{SOURCE_DATASET_NAME}.{SOURCE_TABLE_NAME}`;
+    FROM `{client.project}.{RAW_DATASET}.{RAW_SALES_TABLE}`;
     """
     query_job = client.query(transformation_sql)
     query_job.result()  # Wait for the query to complete
