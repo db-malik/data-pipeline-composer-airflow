@@ -32,6 +32,6 @@ options:
   machineType: 'E2_HIGHCPU_8'  
 
 substitutions:
-  _COMPOSER_BUCKET: '$_COMPOSER_BUCKET'
-  _COMPOSER_ENV_NAME: '$_COMPOSER_ENV_NAME'
-  _LOCATION: '$_LOCATION'
+  _COMPOSER_BUCKET: ''
+  _COMPOSER_ENV_NAME: ''
+  _LOCATION: ''
