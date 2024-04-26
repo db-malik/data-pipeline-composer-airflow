@@ -13,6 +13,11 @@ import os
 # Accessing the variables
 BUCKET_NAME = os.getenv("BUCKET_NAME")
 RAW_DATASET = os.getenv("RAW_DATASET")
+IN_FOLDER = os.getenv("IN_FOLDER")
+DATA_FOLDER = os.getenv("DATA_FOLDER")
+RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
+ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
+
 
 CSV_FILE_NAME = "SALES.csv"
 
