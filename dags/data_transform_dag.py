@@ -13,7 +13,7 @@ import os
 RAW_DATASET = os.getenv("RAW_DATASET")
 RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
 DATAWERHOUSE_DATASET = os.getenv("DATAWERHOUSE_DATASET")
-DWH_TABLE = os.getenv("DWH")
+DWH_TABLE = os.getenv("DWH_TABLEs")
 
 
 # Function to truncate the target table before loading new data
