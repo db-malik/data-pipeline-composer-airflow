@@ -22,6 +22,16 @@ ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
 CSV_FILE_NAME = "SALES.csv"
 
 
+# Define the schema fields
+raw_table_schema = [
+    {"name": "SaleID", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "ProductID", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "Quantity", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "Price", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "SaleDate", "type": "STRING", "mode": "NULLABLE"},
+]
+
+
 # Define default arguments for the DAG: no retries, and start running on January 1st, 2024
 default_args = {
     "owner": "airflow",
@@ -56,13 +66,7 @@ with DAG(
         destination_project_dataset_table=f"{RAW_DATASET}.{RAW_SALES_TABLE}",
         source_format="CSV",
         write_disposition="WRITE_TRUNCATE",
-        schema_fields=[
-            {"name": "SaleID", "type": "STRING", "mode": "NULLABLE"},
-            {"name": "ProductID", "type": "STRING", "mode": "NULLABLE"},
-            {"name": "Quantity", "type": "STRING", "mode": "NULLABLE"},
-            {"name": "Price", "type": "STRING", "mode": "NULLABLE"},
-            {"name": "SaleDate", "type": "STRING", "mode": "NULLABLE"},
-        ],
+        schema_fields=raw_table_schema,
         skip_leading_rows=1,  # Skip the first row (header)
         autodetect=False,  # Explicit schema provided, so autodetect is not needed
         field_delimiter=",",  # CSV delimiter is comma
