@@ -21,7 +21,7 @@ def truncate_target_table():
     client = bigquery.Client()
 
     # Compose the SQL statement for truncating the table
-    sql_query = f"TRUNCATE TABLE `{client.project}.{RAW_DATASET}.{RAW_SALES_TABLE}`"
+    sql_query = f"TRUNCATE TABLE `{client.project}.{DATAWERHOUSE_DATASET}.{DWH_TABLE}`"
 
     try:
         query_job = client.query(sql_query)
