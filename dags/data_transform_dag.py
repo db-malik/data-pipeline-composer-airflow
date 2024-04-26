@@ -5,6 +5,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.cloud import bigquery
+import os
+
 
 # Accessing the variables
 RAW_DATASET = os.getenv("RAW_DATASET")

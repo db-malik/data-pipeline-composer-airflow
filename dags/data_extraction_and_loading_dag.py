@@ -9,35 +9,6 @@ from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
 
 
-# Constants used across the DAG for GCS and BigQuery settings
-# PROJECT_ID = "airflow-composer-transform-csv"
-# BUCKET_NAME = "gcs-viseo-data-academy-22024-1"
-# LOCATION = "europe-west3"
-
-# DATA_FOLDER = "data"
-# IN_FOLDER = "in"
-# ARCHIVE_FOLDER = "archive"
-# ERROR_FOLDER = "error"
-
-# RAW_DATASET = "RAW"
-# RAW_SALES_TABLE = "RAW_SALES_TABLE"
-
-# CSV_SOURCE = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/in/*.csv"
-# IN_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/in/"
-# ARCHIVE_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/archive/"
-# ERROR_FOLDER_PATH = f"gs://{BUCKET_NAME}/{DATA_FOLDER}/error/"
-
-# # Accessing the variables
-# PROJECT_NAME = os.getenv("PROJECT_NAME")
-# BUCKET_NAME = os.getenv("BUCKET_NAME")
-# LOCATION = os.getenv("LOCATION")
-# DATA_FOLDER = os.getenv("DATA_FOLDER")
-# IN_FOLDER = os.getenv("IN_FOLDER")
-# ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
-# ERROR_FOLDER = os.getenv("ERROR_FOLDER")
-# RAW_DATASET = os.getenv("RAW_DATASET")
-# RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
-
 CSV_FILE_NAME = "SALES.csv"
 
 
