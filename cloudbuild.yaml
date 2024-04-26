@@ -2,7 +2,7 @@ steps:
   # Copy the DAG files to the Google Cloud Storage bucket used by Composer
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gsutil'
-    args: ['-m', 'cp', '-r', './dags/', 'gs://$_COMPOSER_BUCKET/']
+    args: ['-m', 'cp', '-r', './dags/', 'gs://${_COMPOSER_BUCKET}/']
 
   # Update environment PyPI packages from requirements.txt
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -10,10 +10,18 @@ steps:
     args:
       - '-c'
       - |
+        # Ensure gcloud is initialized and configured
+        echo "Ensuring gcloud is authenticated and configured..."
+        gcloud auth list
+        gcloud config set project $(gcloud config get-value project)
+
         # Read requirements.txt and format it as a comma-separated list of packages
+        echo "Reading and formatting requirements.txt..."
         PACKAGES=$(awk '{print $1}' requirements.txt | paste -sd "," -)
+        echo "Packages to update: $PACKAGES"
         
         # Update the Composer environment with the packages
+        echo "Updating Composer environment with new packages..."
         gcloud composer environments update ${_COMPOSER_ENV_NAME} \
         --update-pypi-packages=$PACKAGES \
         --location ${_LOCATION}
