@@ -6,12 +6,6 @@ from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
 from google.cloud import bigquery
 
-from dotenv import load_dotenv
-import os
-
-# Load the environment variables from the .env file
-load_dotenv()
-
 # Accessing the variables
 RAW_DATASET = os.getenv("RAW_DATASET")
 RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")

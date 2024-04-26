@@ -8,12 +8,6 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.operators.dummy_operator import DummyOperator
 
-# Import the load_dotenv function from the dotenv module
-from dotenv import load_dotenv
-import os
-
-# Load the environment variables from the .env file
-load_dotenv()
 
 # Constants used across the DAG for GCS and BigQuery settings
 # PROJECT_ID = "airflow-composer-transform-csv"
