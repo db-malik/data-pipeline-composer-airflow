@@ -1,109 +1,197 @@
 # Setting Up Google Cloud Storage, BigQuery, and Cloud Composer with Terraform
 
-This guide provides step-by-step instructions for provisioning Google Cloud Storage (GCS), BigQuery, and Cloud Composer using Terraform.
+This guide provides comprehensive instructions for provisioning Google Cloud Storage (GCS), BigQuery, and Cloud Composer environments using Terraform.
+
+The setup process integrates with GitHub for source control and Google Cloud Build for continuous integration, automating the deployment of Airflow DAGs through Cloud Composer.
 
 # Workflow Overview
 
-- The Terraform deployment process orchestrates the creation of project services architecture in Google Cloud Platform. It begins with defining infrastructure requirements in Terraform configuration files. After initializing Terraform and planning changes, the deployment plan is reviewed before applying changes. Upon applying changes, Terraform creates, modifies, or deletes resources as specified.
+The Terraform deployment orchestrates the creation and configuration of Google Cloud services. Here's a brief overview of the workflow:
 
-- Whenever changes are pushed to the specified branch of GitHub repository, the Cloud Build trigger automatically initiates a build. The build process is defined in the cloudbuild.yaml file located in github repository. This file contains instructions for copying the DAG files from the repository to the Google Cloud Storage bucket used by Composer. Once the build is triggered, Cloud Build executes the steps defined in the cloudbuild.yaml file, ensuring that the latest DAG configurations are available for execution within Composer.
+- Terraform Configuration: Define infrastructure as code using Terraform to manage resources in Google Cloud Platform (GCP).
 
-graph TD; A(GitHub) -->|Push Changes| B(Cloud Build Trigger); B --> C[Build Process]; C --> D[Copy DAG Files to GCS Bucket for airflow ]; D --> E[Execute Steps in cloudbuild.yaml]; E --> F[Update DAG Configurations in Composer];
+- Continuous Integration: Set up Cloud Build triggers to automate the deployment process when changes are pushed to a specified branch in a GitHub repository.
 
-## Prerequisites
+- Resource Provisioning: Automatically create instances of GCS, BigQuery, and Cloud Composer based on Terraform configurations.
 
-Ensure you have Terraform installed on your local machine. Authenticate with Google Cloud using the gcloud CLI and ensure you have the necessary permissions to create resources. Have a Google Cloud project set up and ready for deployment.
-
-## architecture
-
-- composer.tf: This file contains Terraform configuration to deploy a Cloud Composer environment.
-- storage.tf: This file contains Terraform configuration to create a Cloud Storage bucket.
-- bigquery_datawarehouse.tf and bigquery_raw.tf This file contains Terraform configuration to create a BigQuery datasets and tables.
-- cloudbuild.yaml : Copy the DAG files to the Google Cloud Storage bucket used by Composer
-
-## Steps
-
-### **1. Create a Service Account** :
-
-- Go to the [Service Accounts](https://console.cloud.google.com/iam-admin/serviceaccounts) page in the Google Cloud Console.
-- Create Service Account
-- **Generate the Key File** and download
-
-### 2. Authenticate Terraform with GCP
-
-Ensure Terraform can authenticate with your GCP account by setting up Google Cloud credentials:
-
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/credentials.json"
-```
-
-### \*\*3. Set Up Terraform
-
-Clone the repository containing the Terraform configuration files.
+- DAG Deployment: Use Cloud Build to transfer Airflow DAG files from GitHub to GCS, making them available to Cloud Composer for workflow execution.
 
 ```
-git clone <repository_url>
-cd <repository_directory>
-```
-
-### \*\*3. Configure Terraform Variables
-
-Create a terraform.tfvars.json file in the root directory of the repository and specify the required variables such as project ID, credentials file path, region, etc. Refer to the provided example for guidance.
+graph TD;
+    A(GitHub) -->|Push changes| B(Cloud Build Trigger);
+    B -->|Initiate build| C(Build Process);
+    C -->|Deploy resources| D[Provision GCS, BigQuery, Composer];
+    D -->|Copy DAGs| E[Update Configurations in Composer];
 
 ```
-  {
-  "project_id": "your project id",
-  "credentials_file_path": "/path to your credential file",
-  "region": "specify region",
-  "zone": "specify zone",
-  "network": "default",
-  "subnetwork": "default",
-  "environment_name": "composer environement name",
-  "image_version": "composer-2.7.0-airflow-2.7.3",
-  "scheduler_cpu": 0.5,
-  "scheduler_memory_gb": 2,
-  "scheduler_storage_gb": 1,
-  "web_server_cpu": 0.5,
-  "web_server_memory_gb": 2,
-  "web_server_storage_gb": 1,
-  "worker_cpu": 0.5,
-  "worker_memory_gb": 2,
-  "worker_storage_gb": 1,
-  "worker_min_count": 1,
-  "worker_max_count": 3
-  }
-```
 
-### 3. Initialize Terraform Configuration
+# Prerequisites
 
-Run the following command to initialize Terraform and download the required providers and modules:
+- Terraform Installation: Ensure Terraform is installed on your local machine.
+- Google Cloud SDK: Install and authenticate with the Google Cloud SDK.
+- Permissions: Confirm you have the necessary permissions to create and manage resources in your GCP project.
 
-```
-terraform init
-```
+# Architecture Components
 
-### 3. Plan Terraform Deployment
+composer.tf: Configures Cloud Composer. storage.tf: Creates a GCS bucket. bigquery_datawarehouse.tf & bigquery_raw.tf: Set up BigQuery datasets and tables. cloudbuild.yaml: Manages the copying of DAG files to the GCS bucket utilized by Cloud Composer. Setup Steps
 
-Generate an execution plan to preview the changes Terraform will make:
+# Steps
 
-```
- terraform plan -var-file="terraform.tfvars.json"
-```
+1. Create a Service Account
 
-### 3. Apply Terraform Configuration
 
-```
- terraform apply -var-file="terraform.tfvars.json"
-```
+    - Navigate to the Service Accounts page in the GCP Console.
+    - Click on Create Service Account, provide a name, and click Create.
+    - Assign roles necessary for managing GCP resources.
+    - Click on Create Key, select JSON, and download the key file.
 
-Confirm the changes when prompted.
+2. Authenticate Terraform with GCP Set up your environment to authenticate Terraform with GCP:
 
-check your gcp and verify services was created
 
-### 3. Create Cloud Build Trigger
+    ```
+    export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/credentials.json"
+    ```
 
-### Step 7: Automating Deployment with Cloud Build Trigger
+3. Clone and Configure Terraform
 
-Create Cloud Build Trigger:
 
-Navigate to the Google Cloud Console and select your project. Go to Cloud Build > Triggers. Configure Trigger Details: Provide a name and optional description for the trigger. Select the event that should trigger the build, such as Push to a branch. Choose your GitHub repository and specify the branch to monitor. Specify Build Configuration: Select Cloud Build configuration file (yaml) as the configuration type. Choose Repository as the location. Specify the path to the cloudbuild.yaml file in your GitHub repository. Review and Create Trigger.
+    Clone the repository and configure Terraform:
+
+    ```
+    git clone git@github.com:db-malik/data-pipeline-composer-airflow.git
+    cd data-pipeline-composer-airflow
+    ```
+
+4. Define Terraform Variables
+
+
+    Create a terraform.tfvars.json file with all necessary configurations:
+    take the configuration below as a template and update it with your config
+
+    ```
+
+    {
+      "project_id": "your project id,
+      "credentials_file_path": "./your path to credentials.json",
+      "region": "region",
+      "zone": "zone",
+      "network": "default",
+      "subnetwork": "default",
+      "environment_name": "your composer environement name",
+      "image_version": "composer-2.7.0-airflow-2.7.3",
+      "scheduler_cpu": 0.5,
+      "scheduler_memory_gb": 2,
+      "scheduler_storage_gb": 1,
+      "web_server_cpu": 0.5,
+      "web_server_memory_gb": 2,
+      "web_server_storage_gb": 1,
+      "worker_cpu": 0.5,
+      "worker_memory_gb": 2,
+      "worker_storage_gb": 1,
+      "worker_min_count": 1,
+      "worker_max_count": 3
+    }
+
+    ```
+
+5. Initialize terraform
+
+
+    Initialize Terraform and plan your deployment:
+
+    ```
+    terraform init
+    ```
+
+6. Plan Terraform
+
+
+    ```
+    terraform plan -var-file="terraform.tfvars.json"
+    ```
+
+7. Apply Terraform Configuration
+
+
+    Apply the configuration to create the resources:
+
+    ```
+    terraform apply -var-file="terraform.tfvars.json"
+    ```
+
+8. Set Up Cloud Build Trigger
+
+
+    Configure a Cloud Build trigger in the GCP Console:
+
+    Go to Cloud Build > Triggers.
+    Create Trigger.
+    Provide the trigger name, event type (e.g., Push to a branch), and source (GitHub repository).
+    Set the build configuration to use cloudbuild.yaml.
+    Save and create the trigger.
+
+    add three subbscriptions to trigger as folow
+
+      _COMPOSER_BUCKET = 'write composer bucket name'
+      _COMPOSER_ENV_NAME = 'write your composer environement name'
+      _LOCATION = 'write composer location (region)'
+
+9. Add Environment Variables in Cloud Composer
+
+
+    After setting up the necessary infrastructure, it's essential to configure environment variables within your Cloud Composer environment. These variables can be used to control various aspects of your Airflow workflows dynamically.
+
+    - Navigate to the Cloud Composer Environment
+    - Add all Environment Variables below keys and complete the correspandant value :
+
+
+    ```
+        PROJECT_NAME : 'your project name'
+        BUCKET_NAME : 'your cloud storage bucket name'
+        LOCATION  : 'region of your bucket'
+
+        DATA_FOLDER : data
+        IN_FOLDER : in
+        ARCHIVE_FOLDER  : archive
+        ERROR_FOLDER : error
+        RAW_DATASET : RAW
+        RAW_SALES_TABLE : RAW_SALES_TABLE
+        DATAWERHOUSE_DATASET : DATAWERHOUSE
+        DWH_TABLE : DWH
+    ```
+
+Once the Terraform configurations are applied, and the Cloud Build trigger is set up, validate by checking the specified GCP project to ensure all services are correctly provisioned and operational.
+
+10. Push Changes and Monitor Build Process
+
+
+    - After configuring the Cloud Build trigger, push your changes to GitHub to initiate the automated deployment:
+
+    - Push Changes to GitHub:
+     Use git push to upload your latest changes to the branch monitored by the Cloud Build trigger.
+
+    - Check Build Progress:
+      Go to Cloud Build > History in the Google Cloud Console to view the progress and status of your build.
+
+    - Ensure the build completes successfully and without errors.
+
+11. Verify DAGs in Composer
+
+
+    - Ensure that all DAG files are correctly copied and visible in the Cloud Composer environment
+
+    - Check GCS Bucket:
+      Go to the GCS bucket linked with your Composer environment.
+      Verify that all DAG files are present in the specified DAG folder.
+
+    - Open Airflow Web UI:
+      Return to the Cloud Composer details page in the Google Cloud Console.
+      Click on the link to the Airflow web UI found under the Airflow webserver section.
+      In the Airflow UI, check that all DAGs are listed and can be triggered manually.
+
+    - Confirmation
+      Confirm that all components are functional and the DAGs are operational:
+
+    - Ensure that no errors are reported in the Cloud Build history.
+    - Confirm that all DAGs are available in the Airflow web UI and appear as expected.
+    - Optionally, trigger a DAG manually to confirm that workflows execute correctly.
