@@ -39,7 +39,8 @@ default_args = {
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 0,  # No retries
-    "start_date": datetime(2024, 1, 1),
+    # "start_date": datetime(2024, 1, 1),
+    "start_date": datetime.now(),  # Set start date to current time just to reduce charge
     "catchup": False,
 }
 
@@ -48,7 +49,8 @@ with DAG(
     "data_extraction_and_loading_dag",
     default_args=default_args,
     description="Extract data from CSV and load into BigQuery",
-    schedule_interval="0 10 * * *",  # Trigger daily at 10 AM UTC
+    # schedule_interval="0 10 * * *",  # Trigger daily at 10 AM UTC
+    schedule_interval=None,  # Do not schedule, run only manually comment ths ligne  and uncomment the under line for Trigger daily at 10:00
     catchup=False,
 ) as dag:
 
