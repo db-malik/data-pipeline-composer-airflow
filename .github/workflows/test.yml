@@ -12,30 +12,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        # Checks out  repository under $GITHUB_WORKSPACE, so your workflow can access it
+        # Checks out the repository under $GITHUB_WORKSPACE, so your workflow can access it
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-          # sets up the specified version of Python
+          # Sets up the specified version of Python
 
-      #  Adding Caching (Optional Enhancement)
+      # Adding Caching (Optional Enhancement)
       - name: Cache Python packages
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-test.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest pytest-airflow
-          # Installs pip packages, ensuring pytest and pytest-airflow are available for running tests
+          if [ -f requirements-test.txt ]; then pip install -r requirements-test.txt; fi
+          # Installs pip packages from a requirements file if it exists
 
-      - name: Run pytest
-        run: pytest ./tests/
-        # Executes the pytest command, targeting the directory where test files are located
+      - name: Run unittests
+        run: python -m unittest discover -s ./tests/
+        # Executes the unittest discovery mode to find and run tests

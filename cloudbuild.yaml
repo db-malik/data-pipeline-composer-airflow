@@ -5,13 +5,12 @@ steps:
     entrypoint: 'pip'
     args: ['install', '-r', 'requirements-test.txt']
 
-  # Step 2: Run tests on the DAGs
-  # If tests fail, the entire build process will stop and further steps will not execute.
+  # Step 2: Run tests on the DAGs using unittest instead of pytest
   - name: 'python:3.8'
     id: 'run-tests'
-    entrypoint: 'pytest'
-    args: ['./tests/']
-    # This configuration uses the exit code of pytest to decide whether to continue or not.
+    entrypoint: 'python'
+    args: ['-m', 'unittest', 'discover', '-s', './tests/']
+    # The exit code of unittest will determine if the workflow continues
     waitFor: ['install-test-dependencies']
 
   # Step 3: Copy the DAG files to the Google Cloud Storage bucket used by Composer
