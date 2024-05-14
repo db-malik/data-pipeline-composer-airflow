@@ -14,9 +14,13 @@ The Terraform deployment orchestrates the creation and configuration of Google C
 
 - Terraform Configuration: Define infrastructure as code using Terraform to manage resources in Google Cloud Platform (GCP).
 
+![ Architecture](docs/architecture.png ' Architecture')
+
 - Continuous Integration: Set up Cloud Build triggers to automate the deployment process when changes are pushed to a specified branch in a GitHub repository.
 
 - Resource Provisioning: Automatically create instances of GCS, BigQuery, and Cloud Composer based on Terraform configurations.
+
+![ Workflow](docs/architecture.png ' Workflow')
 
 - DAG Deployment: Use Cloud Build to transfer Airflow DAG files from GitHub to GCS, making them available to Cloud Composer for workflow execution.
 

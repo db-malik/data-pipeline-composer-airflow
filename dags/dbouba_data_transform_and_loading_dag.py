@@ -10,10 +10,10 @@ import os
 
 
 # Accessing the variables
-RAW_DATASET = os.getenv("RAW_DATASET")
-RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
-DATAWERHOUSE_DATASET = os.getenv("DATAWERHOUSE_DATASET")
-DWH_TABLE = os.getenv("DWH_TABLE")
+RAW_DATASET = "rawdata"
+RAW_SALES_TABLE = "RAW_DB_DATA"
+DATAWERHOUSE_DATASET = "dwh"
+DWH_TABLE = "DB_SALES"
 
 
 # Function to truncate the target table before loading new data
@@ -69,7 +69,7 @@ default_args = {
 
 
 with DAG(
-    dag_id="data_transformation_and_loading",
+    dag_id="dbouba_data_transformation_and_loading",
     default_args=default_args,
     description="A DAG for data transformation and loading into DWH",
     schedule_interval=timedelta(days=1),

@@ -11,15 +11,15 @@ import os
 
 
 # Accessing the variables
+# use environment variables to access the bucket name for security reasons
 BUCKET_NAME = os.getenv("BUCKET_NAME")
-RAW_DATASET = os.getenv("RAW_DATASET")
-IN_FOLDER = os.getenv("IN_FOLDER")
-DATA_FOLDER = os.getenv("DATA_FOLDER")
-RAW_SALES_TABLE = os.getenv("RAW_SALES_TABLE")
-ARCHIVE_FOLDER = os.getenv("ARCHIVE_FOLDER")
 
-
-CSV_FILE_NAME = "SALES.csv"
+RAW_DATASET = "rawdata"
+IN_FOLDER = "in"
+DATA_FOLDER = "DBOUBA/DATA"
+RAW_SALES_TABLE = "RAW_DB_DATA"
+ARCHIVE_FOLDER = "archive"
+ERROR_FOLDER = "error"
 
 
 # Define the schema fields
@@ -46,11 +46,11 @@ default_args = {
 
 # DAG definition: runs daily at 10 AM UTC
 with DAG(
-    "data_extraction_and_loading_dag",
+    "dbouba_data_extraction_and_loading_dag",
     default_args=default_args,
     description="Extract data from CSV and load into BigQuery",
-    # schedule_interval="0 10 * * *",  # Trigger daily at 10 AM UTC
-    schedule_interval=None,  # Do not schedule, run only manually comment ths ligne  and uncomment the under line for Trigger daily at 10:00
+    schedule_interval="0 10 * * *",  # Trigger daily at 10 AM UTC
+    # schedule_interval=None,  # Do not schedule, run only manually comment ths ligne  and uncomment the under line for Trigger daily at 10:00
     catchup=False,
 ) as dag:
 
@@ -64,7 +64,7 @@ with DAG(
     load_to_bq_task = GCSToBigQueryOperator(
         task_id="load_to_bigquery",
         bucket=BUCKET_NAME,
-        source_objects=[f"{DATA_FOLDER}/*.csv"],
+        source_objects=[f"{DATA_FOLDER}/{IN_FOLDER}/*.csv"],
         destination_project_dataset_table=f"{RAW_DATASET}.{RAW_SALES_TABLE}",
         source_format="CSV",
         write_disposition="WRITE_TRUNCATE",
@@ -79,7 +79,7 @@ with DAG(
     move_file_to_archive = GCSToGCSOperator(
         task_id="move_file_to_archive",
         source_bucket=BUCKET_NAME,
-        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/{CSV_FILE_NAME}",
+        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/*.csv",  # Use wildcard to match all CSV files
         destination_bucket=BUCKET_NAME,
         destination_object=f"{DATA_FOLDER}/{ARCHIVE_FOLDER}/",
         move_object=True,
@@ -90,9 +90,9 @@ with DAG(
     move_file_to_error = GCSToGCSOperator(
         task_id="move_file_to_error",
         source_bucket=BUCKET_NAME,
-        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/{CSV_FILE_NAME}",
+        source_object=f"{DATA_FOLDER}/{IN_FOLDER}/*.csv",  # Use wildcard to match all CSV files
         destination_bucket=BUCKET_NAME,
-        destination_object=f"{DATA_FOLDER}/{IN_FOLDER}/",
+        destination_object=f"{DATA_FOLDER}/{ERROR_FOLDER}/",
         move_object=True,
         trigger_rule=TriggerRule.ONE_FAILED,
     )
@@ -100,7 +100,8 @@ with DAG(
     # Trigger the second DAG after loading data to BigQuery
     trigger_second_dag = TriggerDagRunOperator(
         task_id="trigger_second_dag",
-        trigger_dag_id="data_transformation_and_loading",
+        trigger_dag_id="dbouba_data_transformation_and_loading",
+        trigger_rule=TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS,  # Ensures this runs as long as one of the branches has succeeded without failures
         conf={"message": "Triggered from first_dag"},
     )
 
@@ -110,6 +111,13 @@ with DAG(
     )
 
     # Define task dependencies
-    start >> load_to_bq_task >> trigger_second_dag
-    load_to_bq_task >> move_file_to_archive >> end
-    load_to_bq_task >> move_file_to_error >> end
+    start >> load_to_bq_task
+
+    # Branching to move file to archive or error based on a condition
+    load_to_bq_task >> [move_file_to_archive, move_file_to_error]
+
+    # Both branches eventually lead to triggering a second DAG
+    [move_file_to_archive, move_file_to_error] >> trigger_second_dag
+
+    # Finalize the DAG
+    trigger_second_dag >> end

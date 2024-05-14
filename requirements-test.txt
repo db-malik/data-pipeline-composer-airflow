@@ -1,0 +1,3 @@
+pytest
+pytest-airflow
+google-cloud-bigquery
