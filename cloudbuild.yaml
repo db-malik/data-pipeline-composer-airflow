@@ -1,4 +1,14 @@
 steps:
+  # Install dependencies for testing
+  - name: 'python:3.8'
+    entrypoint: 'pip'
+    args: ['install', '-r', './requirements-test.txt']
+
+  # Run tests on the DAGs
+  - name: 'python:3.8'
+    entrypoint: 'pytest'
+    args: ['./tests/']
+
   # Copy the DAG files to the Google Cloud Storage bucket used by Composer
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gsutil'
