@@ -1,4 +1,5 @@
-pytest 8.2.0
-pytest-airflow
+pytest==4.6.11  # This is the last version to support Python 2, indicative of older structure; adjust as necessary
+pytest-airflow==0.0.3
+
 
 google-cloud-bigquery
