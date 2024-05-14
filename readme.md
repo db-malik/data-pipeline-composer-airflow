@@ -20,7 +20,7 @@ The Terraform deployment orchestrates the creation and configuration of Google C
 
 - Resource Provisioning: Automatically create instances of GCS, BigQuery, and Cloud Composer based on Terraform configurations.
 
-![ Workflow](docs/architecture.png ' Workflow')
+![ Workflow](docs/achitecture_final_workflow.png 'Workflow')
 
 - DAG Deployment: Use Cloud Build to transfer Airflow DAG files from GitHub to GCS, making them available to Cloud Composer for workflow execution.
 
