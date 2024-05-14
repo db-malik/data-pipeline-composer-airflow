@@ -1,1 +1,1 @@
-airflow
+apache-airflow
