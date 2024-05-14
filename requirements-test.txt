@@ -1,3 +1,4 @@
-pytest==5.4.3
-pytest-airflow
+pytest==5.4.3 
+pytest-airflow==0.0.3
+
 google-cloud-bigquery
