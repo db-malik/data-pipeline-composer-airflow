@@ -1,11 +1,13 @@
 import unittest
-from airflow.models import DagBag
 
 
 class TestDAG(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dagbag = DagBag(dag_folder="dags/", include_examples=False)
+        print(
+            "Import errors:", cls.dagbag.import_errors
+        )  # Add this line to see import errors
 
     def test_dag_loaded(self):
         """Check that the DAG file is syntactically correct and can be successfully imported."""
@@ -25,7 +27,7 @@ class TestDAG(unittest.TestCase):
 
     def test_dependencies_of_tasks(self):
         """Check the dependencies of tasks in the DAG."""
-        dag_id = "your_dag_id"
+        dag_id = "dbouba_data_extraction_and_loading_dag"
         dag = self.dagbag.get_dag(dag_id)
         dependencies = {
             "start_task": {"second_task"},
