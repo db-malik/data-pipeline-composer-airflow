@@ -6,7 +6,8 @@ from datetime import datetime
 from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
 from airflow.utils.trigger_rule import TriggerRule
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.empty import EmptyOperator  # instead of DummyOperator
+
 import os
 
 
@@ -55,7 +56,7 @@ with DAG(
 ) as dag:
 
     # Define tasks
-    start = DummyOperator(
+    start = EmptyOperator(
         task_id="start",
         dag=dag,
     )
@@ -105,7 +106,7 @@ with DAG(
         conf={"message": "Triggered from first_dag"},
     )
 
-    end = DummyOperator(
+    end = EmptyOperator(
         task_id="end",
         dag=dag,
     )
