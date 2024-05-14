@@ -1,10 +1,10 @@
 from datetime import timedelta, datetime
 from airflow import DAG
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from google.cloud import bigquery
 from airflow.exceptions import AirflowException
+from airflow.operators.empty import EmptyOperator  # instead of DummyOperator
+from airflow.operators.python import PythonOperator  # updated import for PythonOperator
 
 import os
 
@@ -76,7 +76,7 @@ with DAG(
 ) as dag:
 
     # Define tasks
-    start = DummyOperator(
+    start = EmptyOperator(
         task_id="start",
         dag=dag,
     )
@@ -93,7 +93,7 @@ with DAG(
         dag=dag,
     )
 
-    end = DummyOperator(
+    end = EmptyOperator(
         task_id="end",
         dag=dag,
     )

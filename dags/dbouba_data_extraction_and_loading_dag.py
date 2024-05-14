@@ -50,7 +50,7 @@ with DAG(
     "dbouba_data_extraction_and_loading_dag",
     default_args=default_args,
     description="Extract data from CSV and load into BigQuery",
-    schedule_interval="0 10 * * *",  # Trigger daily at 10 AM UTC
+    schedule="0 10 * * *",  # Trigger daily at 10 AM UTC
     # schedule_interval=None,  # Do not schedule, run only manually comment ths ligne  and uncomment the under line for Trigger daily at 10:00
     catchup=False,
 ) as dag:
