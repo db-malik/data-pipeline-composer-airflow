@@ -5,11 +5,11 @@ from airflow.models import DagBag
 dag_bag = DagBag(dag_folder="./dags/", include_examples=False)
 
 
-# @pytest.fixture(scope="session")
-# def bag():
-#     # Provide a session-scoped fixture that returns the initialized DagBag
-#     # This fixture is reused across all tests in this session, improving test performance
-#     return dag_bag
+@pytest.fixture(scope="session")
+def bag():
+    # Provide a session-scoped fixture that returns the initialized DagBag
+    # This fixture is reused across all tests in this session, improving test performance
+    return dag_bag
 
 
 def test_no_import_errors(bag):
