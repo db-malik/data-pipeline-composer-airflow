@@ -1,18 +1,26 @@
 steps:
-  # Install dependencies for testing
+  # Step 1: Install dependencies for testing
   - name: 'python:3.8'
+    id: 'install-test-dependencies'
     entrypoint: 'pip'
-    args: ['install', '-r', './requirements-test.txt']
+    args: ['install', '-r', 'requirements-test.txt']
 
-  # Run tests on the DAGs
+  # Step 2: Run tests on the DAGs
+  # If tests fail, the entire build process will stop and further steps will not execute.
   - name: 'python:3.8'
+    id: 'run-tests'
     entrypoint: 'pytest'
     args: ['./tests/']
+    # This configuration uses the exit code of pytest to decide whether to continue or not.
+    waitFor: ['install-test-dependencies']
 
-  # Copy the DAG files to the Google Cloud Storage bucket used by Composer
+  # Step 3: Copy the DAG files to the Google Cloud Storage bucket used by Composer
+  # This step only runs if the test step succeeds.
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-dags'
     entrypoint: 'gsutil'
     args: ['-m', 'cp', '-r', './dags/', 'gs://$_COMPOSER_BUCKET/']
+    waitFor: ['run-tests']  # This step waits for the 'run-tests' step to complete successfully.
 
 timeout: '1200s'  
 options:
@@ -20,6 +28,6 @@ options:
   machineType: 'E2_HIGHCPU_8'  
 
 substitutions:
-  _COMPOSER_BUCKET: ''
+  _COMPOSER_BUCKET: ''  # Fill in your Composer bucket
   _COMPOSER_ENV_NAME: ''
   _LOCATION: ''
